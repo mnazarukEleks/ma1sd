@@ -64,24 +64,11 @@ public class LdapProfileProvider extends LdapBackend implements ProfileProvider 
 
             for (String baseDN : getBaseDNs()) {
                 log.debug("Base DN: {}", baseDN);
-                try (EntryCursor cursor = conn.search(baseDN, searchQuery, SearchScope.SUBTREE, getAt().getName())) {
+                try (EntryCursor cursor = conn.search(baseDN, searchQuery, SearchScope.SUBTREE, getAt().getName(), getAt().getDepartment())) {
                     while (cursor.next()) {
                         Entry entry = cursor.get();
                         log.info("Found possible match, DN: {}", entry.getDn().getName());
-                        Optional<String> v = getAttribute(entry, getAt().getName()).flatMap(id -> {
-                            log.info("DN {} is a valid match", entry.getDn().getName());
-                            try {
-                                return getAttribute(entry, getAt().getName());
-                            } catch (IllegalArgumentException e) {
-                                log.warn("Bind was found but type {} is not supported", getAt().getUid().getType());
-                                return Optional.empty();
-                            }
-                        });
-
-                        if (v.isPresent()) {
-                            log.info("DN {} is the final match", entry.getDn().getName());
-                            return v;
-                        }
+                        return  getDisplayName(entry);
                     }
                 } catch (CursorLdapReferralException e) {
                     log.warn("An entry is only available via referral, skipping");

@@ -77,7 +77,7 @@ public class LdapDirectoryProvider extends LdapBackend implements DirectoryProvi
                             try {
                                 UserDirectorySearchResult.Result entryResult = new UserDirectorySearchResult.Result();
                                 entryResult.setUserId(buildMatrixIdFromUid(uid));
-                                getAttribute(entry, atCfg.getName()).ifPresent(entryResult::setDisplayName);
+                                getDisplayName(entry).ifPresent(entryResult::setDisplayName);
                                 result.addResult(entryResult);
                             } catch (IllegalArgumentException e) {
                                 log.warn("Bind was found but type {} is not supported", atCfg.getUid().getType());
@@ -100,6 +100,7 @@ public class LdapDirectoryProvider extends LdapBackend implements DirectoryProvi
         log.info("Performing LDAP directory search on display name using '{}'", query);
         List<String> attributes = new ArrayList<>();
         attributes.add(getAt().getName());
+        attributes.add(getAt().getDepartment());
         attributes.addAll(getCfg().getDirectory().getAttribute().getOther());
         return search(query, attributes);
     }
@@ -109,6 +110,7 @@ public class LdapDirectoryProvider extends LdapBackend implements DirectoryProvi
         log.info("Performing LDAP directory search on 3PIDs using '{}'", query);
         List<String> attributes = new ArrayList<>();
         attributes.add(getAt().getName());
+        attributes.add(getAt().getDepartment());
         getCfg().getAttribute().getThreepid().forEach((k, v) -> attributes.addAll(v));
         return search(query, attributes);
     }

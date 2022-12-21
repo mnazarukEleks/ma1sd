@@ -40,6 +40,7 @@ import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.SearchScope;
+import org.apache.directory.api.util.Strings;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,6 +104,7 @@ public class LdapAuthProvider extends LdapBackend implements AuthenticatorProvid
             Set<String> attributes = new HashSet<>();
             attributes.add(getUidAtt());
             attributes.add(getAt().getName());
+            attributes.add(getAt().getDepartment());
             getAt().getThreepid().forEach((k, v) -> attributes.addAll(v));
             String[] attArray = new String[attributes.size()];
             attributes.toArray(attArray);
@@ -131,8 +133,7 @@ public class LdapAuthProvider extends LdapBackend implements AuthenticatorProvid
                             return BackendAuthResult.failure();
                         }
 
-                        Attribute nameAttribute = entry.get(getAt().getName());
-                        String name = nameAttribute != null ? nameAttribute.get().toString() : null;
+                        String name = getDisplayName(entry).orElse(null);
 
                         log.info("Authentication successful for {}", entry.getDn().getName());
                         log.info("DN {} is a valid match", dn);

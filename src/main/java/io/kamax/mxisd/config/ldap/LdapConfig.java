@@ -59,6 +59,7 @@ public abstract class LdapConfig {
 
         private UID uid = new UID();
         private String name = "displayName";
+        private String department = "departmentNumber";
         private Map<String, List<String>> threepid = new HashMap<>();
 
         public Attribute() {
@@ -91,6 +92,14 @@ public abstract class LdapConfig {
 
         public String getName() {
             return name;
+        }
+
+        public void setDepartment(String name) {
+            this.department = department;
+        }
+
+        public String getDepartment() {
+            return department;
         }
 
         public void setName(String name) {

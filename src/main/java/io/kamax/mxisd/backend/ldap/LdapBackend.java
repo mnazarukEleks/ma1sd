@@ -184,6 +184,21 @@ public abstract class LdapBackend {
         return values;
     }
 
+    Optional<String> getDisplayName(Entry entry) {
+        Attribute nameAttribute = entry.get(getAt().getName());
+        if (nameAttribute == null) {
+            return Optional.empty();
+        }
+        String name = nameAttribute.get().toString();
+        Attribute departmentAttribute = entry.get(getAt().getDepartment());
+        if (departmentAttribute == null) {
+            return Optional.of(name);
+        }
+        String department = " [" + departmentAttribute.get().toString() + "]";
+        log.info("valid match: " + name + department);
+        return Optional.of(name + department);
+    }
+
     private class UPN {
         private String login;
         private String domain;
